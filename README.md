@@ -17,3 +17,11 @@ ALNS does super good in the literature.
 
 
 ### Data Structure
+
+The classic structure is a list of lists.
+
+```
+[[0, 1, 0], [0, 2, 3, 0] [0, 0] ... ]
+```
+
+How to include charging time?
