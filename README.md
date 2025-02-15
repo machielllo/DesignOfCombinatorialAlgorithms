@@ -5,13 +5,15 @@ DCA Course RUG 2025
 
 ### Heuristic
 
-ALNS does super good in the literature.
+ALNS does super good in the literature. State of the Art. 
 
 #### Constructive
 
 - Needs to be feasible
 
 - Sweep / Bin Pack?
+
+- NN, reason with constraints
 
 #### Improvements
 
