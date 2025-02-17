@@ -2,8 +2,32 @@
 #+author: M. L. Kroon, B. Aslan
 #+startup: hidestars overview
 
+* TODO Implement argparse in main
 
-* Classes
+* TODO Cost Evaluation Functions (solution and vehicle)
+
+* TODO Customer Assignment
+maybe: =(vehicle_id, trip_idx)=
+But: keep track of locker_assignment
+maybe: =(vehicle_id, trip_idx, locker_bool)=
+
+* TODO Finish Constructor
+
+* TODO write method Solution
+Just write out to =.sol= file.
+(+ annotated)?
+
+* TODO Plotting Solutions
+
+* TODO Basic Repair and Destroy Operators.
+Keep =request.py=? 
+Then we can select repair operators based on the request list.
+
+* TODO Verify copy methods
+
+
+
+* Classes (old)
 
 ** Instance
 Contains and reads data from .inst file.
