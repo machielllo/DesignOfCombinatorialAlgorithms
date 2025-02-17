@@ -1,0 +1,19 @@
+#+title: C++ Code
+#+author: M.L. Kroon
+
+
+ + Data Structures and Handling makes more sense
+ + Hopefully much faster
+ - No linked lists
+ - Takes way more time to code
+
+
+
+* Consts & Data Hiding
+
+For a small project I don't think it really matters.
+
+To make everything in Instance const, We need a new constructor
+and call that from the constructor for a file. (I think)
+
+
