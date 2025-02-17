@@ -34,7 +34,6 @@ Somehow keep track of brokenness:
 
 repair operators -> return Solution
 
-
 ** Vehicles / Customers etc.
 I think this is overkill...
 

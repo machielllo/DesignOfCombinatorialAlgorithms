@@ -1,42 +1,13 @@
 from itertools import combinations
+import numpy as np
+import pandas as pd
 
-# Too much??
+ID = int
 
-# class Destination:
-#     def __init__(self, ID):
-#         self.ID = ID
 
-# class Customer(Destination):
-#     def __init__(self, ID):
-#         super().__init__(ID)
-#     def __repr__(self):
-#         return f'C{self.ID}'
-
-# class Station(Destination):
-#     def __init__(self, ID, charge_time):
-#         super().__init__(ID)
-#         self.charge_time = charge_time
-        
-#     def __repr__(self):
-#         return f'S{self.ID}, {self.charge_time:.2f}'
-
-# class Locker(Destination):
-#     def __init__(self, ID):
-#         super().__init__(ID)
-        
-#     def __repr__(self):
-#         return f'L{self.ID}'
-
-# class Depot(Destination):
-#     def __init__(self):
-#         self.ID = 0
-#         self.location = (0, 0)
-#     def __repr__(self):
-#         return '0'
-
-class ProblemInstance:
+class Instance:
     def __init__(self, file_path):
-        read_instance(file_path: str)
+        self.read_instance(file_path: str)
 
         np.linalg.norm()
         self.distances = pd.DataFrame()
@@ -45,7 +16,7 @@ class ProblemInstance:
     def read_instance(self, file_path: str):
         with open(file_path, 'r') as f:
             self.instance_id = int(f.readline())
-            f.readline()        # skip empty line
+            f.readline()        # skip empty line (?)
             self.num_customers = int(f.readline())
             self.num_chargers = int(f.readline())
             self.num_lockers = int(f.readline())
@@ -66,6 +37,7 @@ class ProblemInstance:
                 line = f.readline()
                 vid, charge = line.split(',')
                 self.vehicles[int(vid.strip())] = Vehicle(float(vid.strip()))
+            
             self.nodes = dict()
             node_id, x, y, deadline = f.readline().split(',')
             self.nodes[node_id] = Depot(float(x), float(y), float(deadline))
@@ -81,9 +53,6 @@ class ProblemInstance:
                 self.nodes[int(node_id)] = Locker(float(x), float(y), float(service_time))
             # self.distances = np.linalg.norm(a - b for a, b in combinations(self.nodes.values()))
 
-def contruction_heuristic(problem: ProblemInstance) -> Solution:
-    
-    return 
                 
 class Solution:
                 
