@@ -17,3 +17,4 @@ To make everything in Instance const, We need a new constructor
 and call that from the constructor for a file. (I think)
 
 
+* TODO use lists and unordered_maps
