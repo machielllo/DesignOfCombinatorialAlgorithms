@@ -4,7 +4,7 @@
 
  + Data Structures and Handling makes more sense
  + Hopefully much faster
- - No linked lists
+ - +No linked lists+
  - Takes way more time to code
 
 
