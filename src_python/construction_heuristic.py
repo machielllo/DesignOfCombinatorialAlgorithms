@@ -13,36 +13,45 @@ def construction_heuristic(instance: Instance) -> Solution:
     vids = cycle(instance.vehicle_ids)
     customer_assignment = {cid: None for cid in instance.customer_ids}
 
-    for lid in instance.locker_ids:
-        # Can the locker even be reached without charging?
-        if not instance.reachable_return(lid):
-            continue
-        vid = next(vids)
-        vehicle = vehicles[vid]
-        assigned, load = initial_locker_assignment(lid, instance, unassigned)
-        if len(assigned) == 0:
-            continue
+    # for lid in instance.locker_ids:
+    #     # Can the locker even be reached without charging?
+    #     if not instance.reachable_return(lid):
+    #         continue
+    #     vid = next(vids)
+    #     vehicle = vehicles[vid]
+    #     assigned, load = initial_locker_assignment(lid, instance, unassigned)
+    #     if len(assigned) == 0:
+    #         continue
         
-        for cid in assigned:
-            customer_assignment[cid] = (vid, None, lid)
-            unassigned.remove(cid)
-        # What if I have more lockers than vehicles?
-        trip = vehicle.next_empty_trip()
-        vehicle.insert(node_id=lid, trip=trip)
-        vehicle.load[trip] = load
-        # vehicle.distance = 2 * instance.distance[lid, instance.depot_id] # ?
-        
+    #     for cid in assigned:
+    #         customer_assignment[cid] = (vid, None, lid)
+    #         unassigned.remove(cid)
+    #     # What if I have more lockers than vehicles?
+    #     trip = vehicle.next_empty_trip()
+    #     vehicle.insert(node_id=lid, trip=trip)
+    #     vehicle.load[trip] = load
+    #     # vehicle.distance = 2 * instance.distance[lid, instance.depot_id] # ?
     
     while unassigned:
-        vehicle = vehicles[next(vids)]
+        vid = next(vids)
+        vehicle = vehicles[vid]
         trip = vehicle.next_empty_trip()
         
         nn = min(unassigned, key=lambda x: instance.distances.loc[instance.depot_id, x])
 
         if not instance.reachable_return(nn):
             path = instance.shortest_capable_path(nn)
-            print(path, '\nTo Do')
-            unassigned.remove(nn)
+            if path[-2] in instance.locker_ids:
+                lid = path[-2]
+                path = path[:-1] + path[:-1][::-1]
+                customer_assignment[nn] = (vid, trip, lid)
+            else:
+                path = path + path[:-1][::-1]
+                customer_assignment[nn] = (vid, trip, 0)
+            vehicle.route[trip] = path
+            vehicle.load[trip] = instance.demands[nn]
+            # print(path, '\nTo Do')
+            # unassigned.remove(nn)
             
         distance = instance.distances.loc[instance.depot_id, nn]
         charge_cost = distance * instance.discharge_rate
@@ -52,9 +61,10 @@ def construction_heuristic(instance: Instance) -> Solution:
               instance.reachable_return(nn, prev, instance.battery_capacity - charge_cost):
             vehicle.insert(node_id=nn, trip=trip)
             unassigned.remove(nn)
+            customer_assignment[nn] = (vid, trip, 0)
             prev = nn
             nn = min(unassigned, key=lambda x: instance.distances.loc[instance.depot_id, x])
-            distance = instance.distances.loc[instance.depot_id, nn]
+            distance = instance.distances.loc[prev, nn]
             charge_cost += distance * instance.discharge_rate
             load += instance.demands[nn]
             

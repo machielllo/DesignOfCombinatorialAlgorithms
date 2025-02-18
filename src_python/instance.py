@@ -116,19 +116,25 @@ class Instance:
     def _dijkstra(self):
         max_distance = self.battery_capacity / self.discharge_rate
         graph = self.distances.copy()
-        graph.loc[self.customer_ids, self.customer_ids] = np.inf
+        graph.loc[self.customer_ids] = np.inf
         graph.loc[self.locker_ids, self.locker_ids] = np.inf
-        for col in graph.columns:
-            if col in self.locker_ids:
-                graph[col] = graph[col].apply(lambda x: np.inf if x > self.locker_radius else x)
-            else:
-                graph[col] = graph[col].apply(lambda x: np.inf if x > max_distance else x)
-        np.fill_diagonal(graph.values, np.inf)
+        graph.loc[self.locker_ids, self.charger_ids] = np.inf
+        graph.loc[self.locker_ids, self.depot_id] = np.inf
+        # np.fill_diagonal(graph.values, np.inf)
+        graph.loc[self.locker_ids, self.customer_ids] = graph.loc[self.locker_ids, self.customer_ids].map(
+            lambda x: np.inf if x > self.locker_radius else x
+        )
+        graph.loc[self.depot_id] = graph.loc[self.depot_id].map(
+            lambda x: np.inf if x > max_distance else x
+        )
+        graph.loc[self.charger_ids] = graph.loc[self.charger_ids].map(
+            lambda x: np.inf if x > max_distance else x
+        )
         
         n = len(graph)
         distances = {i: float('inf') for i in range(n)}
         distances[self.depot_id] = 0
-        priority_queue = [(self.depot_id, self.depot_id)]
+        priority_queue = [(0, self.depot_id)]
         predecessors = {i: None for i in range(n)}
 
         while priority_queue:
@@ -145,7 +151,7 @@ class Instance:
 
         self.dijkstra_distances = distances
         self.dijkstra_predecessors = predecessors
-
+        
     def shortest_capable_path(self, target):
         path = []
         while target is not None:
