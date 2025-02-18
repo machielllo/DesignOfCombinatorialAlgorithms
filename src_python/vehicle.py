@@ -6,7 +6,8 @@ class Vehicle:
     def __init__(
         self, initial_charge,
         route: list = None,
-        load: list = None,   
+        load: list = None,
+        distance: list = None,
         charge_times: list = None          
     ):
         self.charge = initial_charge
@@ -18,6 +19,8 @@ class Vehicle:
             self.load = [0]
         else:
             self.load = load
+        if distance is None:
+            self.distance = distance
         if charge_times is None:
             self.charge_times = [[0, 0]]
         else:
@@ -28,6 +31,7 @@ class Vehicle:
             self.charge,
             route=self.route.deepcopy(),
             load=self.load.copy(),
+            distance=self.distance.copy()
             charge_times=self.charge_times.deepcopy()
         )
 
@@ -37,8 +41,14 @@ class Vehicle:
                 return idx
         self.route.append([0, 0])
         self.load.append(0)
+        self.distance.append(0)
         return idx + 1
 
-    def insert(self, node_id: int, trip: int, position=-2):
+    def insert(self, node_id: int, trip: int, position=-1):
         self.route[trip].insert(position, node_id)
         
+    def __repr__(self):
+        full_str = ""
+        for trip in self.route:
+            full_str += trip.__str__()
+        return full_str
