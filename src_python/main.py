@@ -3,14 +3,14 @@ from solution import Solution
 from alns import ALNS
 from construction_heuristic import construction_heuristic
 # from operators import *
-import argparse
-
-parser = argparse.ArgumentParser(description='Solve a MEVRP-PL instance using ALNS.')
+# import argparse
+# parser = argparse.ArgumentParser(description='Solve a MEVRP-PL instance using ALNS.')
 
 
 instance = Instance('../Toys/Not Annotated/996.inst')
+construction_heuristic(instance)
 
-print(instance.distances[0][1])
+# print(instance.distances[0][1])
 
 def main(instance_file, output_file):
     instance = Instance(instance_file)

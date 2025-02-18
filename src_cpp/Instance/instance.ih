@@ -1,6 +1,0 @@
-#include "instance.h"
-#include <fstream>
-#include <cmath>
-#include <iostream>
-
-using namespace std;

@@ -5,7 +5,7 @@ import pandas as pd
 
 class Instance:
     def __init__(self, file_path: str):
-        self.read_instance(file_path)
+        self.read(file_path)
         loc_values = list(self.locations.values())
         node_ids = list(self.locations.keys())
         self.distances = pd.DataFrame(
@@ -35,11 +35,11 @@ class Instance:
             self.violation_cost_depot = float(f.readline())
             
             self.vehicle_ids = []
-            self.inital_charge = dict()
+            self.initial_charge = dict()
             for i in range(self.num_vehicles):
                 vid, charge = f.readline().split(',')
                 self.vehicle_ids.append(int(vid))
-                self.inital_charge[int(vid)] = float(charge)
+                self.initial_charge[int(vid)] = float(charge)
             
             self.customer_ids = []
             self.locker_ids = []
@@ -73,9 +73,10 @@ class Instance:
                 self.locations[int(node_id)] = (float(x), float(y))
                 self.service_times[int(node_id)] = float(service_time)
 
-        def reachable_return(node_id, start=self.depot_id, charge=self.battery_capacity):
+        def reachable_return(self, node_id, start=self.depot_id, charge=self.battery_capacity):
             total_distance = distance[start, node_id] + distance[node_id, self.depot_id]
             if total_distance * self.discharge_rate < charge:
                 return True
-            else return False
+            else:
+                return False
             
