@@ -72,3 +72,10 @@ class Instance:
                 self.locker_ids.append(int(node_id))
                 self.locations[int(node_id)] = (float(x), float(y))
                 self.service_times[int(node_id)] = float(service_time)
+
+        def reachable_return(node_id, start=self.depot_id, charge=self.battery_capacity):
+            total_distance = distance[start, node_id] + distance[node_id, self.depot_id]
+            if total_distance * self.discharge_rate < charge:
+                return True
+            else return False
+            
