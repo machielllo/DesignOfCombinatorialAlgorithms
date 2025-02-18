@@ -33,7 +33,7 @@ class Vehicle:
             instance=self.instance,
             route=self.route.deepcopy(),
             load=self.load.copy(),
-            distance=self.total_distance,
+            total_distance=self.total_distance,
             charge_times=self.charge_times.deepcopy()
         )
 
@@ -49,9 +49,9 @@ class Vehicle:
         deleted_arc = self.route[trip][position - 1], self.route[trip][position]
         self.route[trip].insert(position, node_id)
         self.load[trip] += self.instance.demand[node_id]
-        self.distance -= self.instance.distances.loc[*deleted_arc]
-        self.distance += self.instance.distances.loc[deleted_arc[0], node_id]
-        self.distance += self.instance.distances.loc[node_id, deleted_arc[1]]
+        self.total_distance -= self.instance.distances.loc[*deleted_arc]
+        self.total_distance += self.instance.distances.loc[deleted_arc[0], node_id]
+        self.total_distance += self.instance.distances.loc[node_id, deleted_arc[1]]
         self.charge.insert(position, charge)
 
     def minimize_charge_times(self):
