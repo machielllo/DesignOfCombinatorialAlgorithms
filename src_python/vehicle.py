@@ -104,7 +104,6 @@ class Vehicle:
                 time += self.recharge_quantities[i][j+1] / self.instance.recharge_rate
                 dti.append(time)
             departure_times.append(dti)
-            
         return departure_times
 
     def print(self):

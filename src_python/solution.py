@@ -207,5 +207,28 @@ class Solution:
 
         ax.set_aspect('equal')
         fig.show()
+
+    def penalty_cost(self) -> float:
+        "calculate the cost for deadline penalties"
+        depot_penalty = 0
+        customer_penalty = 0
+        for v in self.vehicles.values():
+            departure_times = v.departure_times()
+            depot_penalty += self.instance.violation_cost_depot * max(
+                0, departure_times[-1] - self.instance.deadlines[self.instance.depot_id]
+            )
+            
+            
+    # def insert_cost(self, node_id: int, vid: int, trip: int, index: int):
+    #     if self.vehicles[vid].load[trip] + self.instance.demands[node_id] > \
+    #        self.instance.volume_capacity:
+    #         return np.inf
         
+    #     arc = self.vehicles[vid].route[trip][index-1], self.vehicles[vid].route[trip][index]
+    #     delta_distance = -self.instance.distances.loc[arc[0], arc[1]]
+    #     delta_distance += self.instance.distances.loc[arc[0], node_id]
+    #     delta_distance += self.instance.distances.loc[node_id, arc[0]]
+    #     cost = delta_distance * self.instance.travel_cost
+    #     if self.vehicles[vid].total_distance == 0:
+    #         cost += self.instance.deployment_cost
         
