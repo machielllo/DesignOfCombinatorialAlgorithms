@@ -12,7 +12,7 @@ class Solution:
                  request_list: list = []):
         self.instance = instance
         if vehicles is None:
-            self.vehicles = {vid: Vehicle(instance.inital_charge[vid]) for vid in instance.vehicle_ids}
+            self.vehicles = {vid: Vehicle(instance, vid) for vid in instance.vehicle_ids}
         else:
             self.vehicles = vehicles
         if customer_assignment is None:

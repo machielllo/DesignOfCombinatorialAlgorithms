@@ -120,17 +120,31 @@ class Instance:
         graph.loc[self.locker_ids, self.locker_ids] = np.inf
         graph.loc[self.locker_ids, self.charger_ids] = np.inf
         graph.loc[self.locker_ids, self.depot_id] = np.inf
-        # np.fill_diagonal(graph.values, np.inf)
+        np.fill_diagonal(graph.values, np.inf)
         graph.loc[self.locker_ids, self.customer_ids] = graph.loc[self.locker_ids, self.customer_ids].map(
             lambda x: np.inf if x > self.locker_radius else x
         )
-        graph.loc[self.depot_id] = graph.loc[self.depot_id].map(
-            lambda x: np.inf if x > max_distance else x
-        )
-        graph.loc[self.charger_ids] = graph.loc[self.charger_ids].map(
-            lambda x: np.inf if x > max_distance else x
-        )
-        
+        graph.loc[self.depot_id, self.locker_ids + self.customer_ids] = \
+            graph.loc[self.depot_id, self.locker_ids + self.customer_ids].map(
+                lambda x: np.inf if 2 * x > max_distance else x
+            )
+        graph.loc[self.depot_id, self.charger_ids] = \
+            graph.loc[self.depot_id, self.charger_ids].map(
+                lambda x: np.inf if x > max_distance else x
+            )
+        graph.loc[self.charger_ids, self.locker_ids + self.customer_ids] = \
+            graph.loc[self.charger_ids, self.locker_ids + self.customer_ids].map(
+                lambda x: np.inf if 2*x > max_distance else x
+            )
+        graph.loc[self.charger_ids, self.depot_id] = \
+            graph.loc[self.charger_ids, self.depot_id].map(
+                lambda x: np.inf if x > max_distance else x
+            )
+        graph.loc[self.charger_ids, self.charger_ids] = \
+            graph.loc[self.charger_ids, self.charger_ids].map(
+                lambda x: np.inf if x > max_distance else x
+            )
+        self.graph = graph
         n = len(graph)
         distances = {i: float('inf') for i in range(n)}
         distances[self.depot_id] = 0

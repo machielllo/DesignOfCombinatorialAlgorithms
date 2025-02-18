@@ -1,5 +1,6 @@
 from instance import Instance
 from solution import Solution
+from vehicle import Vehicle
 from alns import ALNS
 from construction_heuristic import construction_heuristic
 # from operators import *
@@ -10,11 +11,19 @@ from construction_heuristic import construction_heuristic
 instances = ['929.inst', '943.inst', '973.inst', '978.inst', '996.inst']
 
 for inst in instances:
-    
+    pass
 
 instance = Instance('../Toys/Not Annotated/996.inst')
 solution = construction_heuristic(instance)
 print(solution.vehicles)
+
+
+for vehicle in solution.vehicles.values():
+    vehicle.print()
+
+
+v2 = solution.vehicles[2]
+
 
 # print(instance.distances[0][1])
 

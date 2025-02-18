@@ -9,7 +9,7 @@ def construction_heuristic(instance: Instance) -> Solution:
     "Construct an initial feasible solution"
     unassigned = set(instance.customer_ids)
     
-    vehicles = {vid: Vehicle(instance) for vid in instance.vehicle_ids}
+    vehicles = {vid: Vehicle(instance, vid) for vid in instance.vehicle_ids}
     vids = cycle(instance.vehicle_ids)
     customer_assignment = {cid: None for cid in instance.customer_ids}
 
@@ -48,8 +48,9 @@ def construction_heuristic(instance: Instance) -> Solution:
             else:
                 path = path + path[:-1][::-1]
                 customer_assignment[nn] = (vid, trip, 0)
-            vehicle.route[trip] = path
-            vehicle.load[trip] = instance.demands[nn]
+            for node in path[1:-1]:
+                vehicle.insert(node, trip)
+            vehicle.minimize_recharge_quantities()
             unassigned.remove(nn)
             # print(path, '\nTo Do')
             
