@@ -8,7 +8,8 @@ from construction_heuristic import construction_heuristic
 
 
 instance = Instance('../Toys/Not Annotated/996.inst')
-construction_heuristic(instance)
+solution = construction_heuristic(instance)
+solution.plot()
 
 # print(instance.distances[0][1])
 

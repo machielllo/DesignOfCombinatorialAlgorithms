@@ -50,8 +50,9 @@ def construction_heuristic(instance: Instance) -> Solution:
                 customer_assignment[nn] = (vid, trip, 0)
             vehicle.route[trip] = path
             vehicle.load[trip] = instance.demands[nn]
+            unassigned.remove(nn)
             # print(path, '\nTo Do')
-            # unassigned.remove(nn)
+            
             
         distance = instance.distances.loc[instance.depot_id, nn]
         charge_cost = distance * instance.discharge_rate
