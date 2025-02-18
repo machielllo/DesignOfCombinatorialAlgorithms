@@ -1,5 +1,6 @@
 from instance import Instance
 from copy import deepcopy
+import numpy as np
 
 class Vehicle:
     def __init__(
@@ -67,13 +68,9 @@ class Vehicle:
             for idx, node in enumerate(trip[1:]):
                 distance += self.instance.distances.loc[prev_node, node]
                 if node in self.instance.charger_ids:
-                    print(charge)
                     charge_needed = distance * self.instance.discharge_rate
-                    print(charge_needed)
                     recharge = max(0, charge_needed - charge)
-                    print(recharge)
                     charge = charge + recharge - charge_needed
-                    print(charge)
                     # charge_time = charge_needed / self.instance.recharge_rate
                     self.recharge_quantities[trip_idx][prev_charge_idx] = recharge
                     prev_charge_idx = idx + 1
@@ -85,29 +82,30 @@ class Vehicle:
         for i, trip in enumerate(self.route):
             dti = [self.recharge_quantities[i][0] / self.instance.recharge_rate]
             prev_node = trip[0]
-            for j, node in enumerate(trip[:1]):
+            for j, node in enumerate(trip[1:]):
                 time = dti[-1]
                 # add travel time
                 time += self.instance.distances.loc[prev_node, node] / self.instance.speed
                 # add service time
                 if node in self.instance.service_times:
                     time += self.instance.service_times[node]
-                time += self.recharge_quantities[i][j]
+                time += self.recharge_quantities[i][j+1] / self.instance.recharge_rate
                 dti.append(time)
             departure_times.append(dti)
             
         return departure_times
 
     def print(self):
+        def format_list(lst):
+            return "[" + ", ".join(f"{x:.2f}" if isinstance(x, (float, np.float64, np.float32)) else str(x) for x in lst) + "]"
+
         print(f"Vehicle {self.ID}:")
-        print(f"Route:\t\t\t {self.route}")
-        print(f"Recharge Quantities:\t {self.recharge_quantities}")
-        print(f"Departure Times:\t {self.departure_times()}")
-        print(f"Loads: {self.load}")
+        print(f"Route:".ljust(20), [format_list(trip) for trip in self.route])
+        print(f"Recharge Quantities:".ljust(20), [format_list(rq) for rq in self.recharge_quantities])
+        print(f"Departure Times:".ljust(20), [format_list(dt) for dt in self.departure_times()])
+        print(f"Loads:".ljust(20), format_list(self.load))
+        print(f"Total Distance:".ljust(20), f"{self.total_distance:.2f}")
         print()
-        
+
     def __repr__(self):
-        full_str = ""
-        for trip in self.route:
-            full_str += trip.__str__()
-        return full_str
+        return f"Vehicle {self.ID} | Route: {self.route} | Load: {self.load} | Distance: {self.total_distance:.2f}"
