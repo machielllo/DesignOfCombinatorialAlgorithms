@@ -40,7 +40,9 @@ def construction_heuristic(instance: Instance) -> Solution:
         nn = min(unassigned, key=lambda x: instance.distances.loc[instance.depot_id, x])
 
         if not instance.reachable_return(nn):
-            path = instance.find_charge_path(instance.depot_id, nn)
+            path = instance.shortest_capable_path(nn)
+            print(path, '\nTo Do')
+            unassigned.remove(nn)
             
         distance = instance.distances.loc[instance.depot_id, nn]
         charge_cost = distance * instance.discharge_rate

@@ -1,7 +1,7 @@
 from itertools import combinations
 import numpy as np
 import pandas as pd
-
+import heapq
 
 class Instance:
     def __init__(self, file_path: str):
@@ -12,6 +12,7 @@ class Instance:
             np.linalg.norm(np.array(loc_values)[:, np.newaxis] - np.array(loc_values), axis=2),
             index=node_ids, columns=node_ids
         )
+        self._dijkstra()
 
         
     def read(self, file_path: str):
@@ -73,15 +74,15 @@ class Instance:
                 self.locations[int(node_id)] = (float(x), float(y))
                 self.service_times[int(node_id)] = float(service_time)
 
-    def find_charge_path(self, from_id: int, to_id: int, charge=None) -> list[int]:
-        "return a list of charging stations along the way"
-        if charge is None:
-            charge = self.battery_capacity
-        intermediate_chargers = [
-            chid for chid in self.charger_ids if
-            self.distances.loc[chid, to_id] < self.distances.loc[from_id, to_id] and
-            self.distances.loc[chid, from_id] < self.distances.loc[from_id, to_id]
-        ]
+    # def find_charge_path(self, from_id: int, to_id: int, charge=None) -> list[int]:
+    #     "return a list of charging stations along the way"
+    #     if charge is None:
+    #         charge = self.battery_capacity
+    #     intermediate_chargers = [
+    #         chid for chid in self.charger_ids if
+    #         self.distances.loc[chid, to_id] < self.distances.loc[from_id, to_id] and
+    #         self.distances.loc[chid, from_id] < self.distances.loc[from_id, to_id]
+    #     ]
         
     
                 
@@ -96,3 +97,58 @@ class Instance:
         else:
             return False
             
+
+    # def reduced_charge_graph(self):
+    #     max_distance = self.battery_capacity / self.discharge_rate
+    #     graph = self.distances.copy()
+    #     for i in self.customer_ids:
+    #         for j in self.customer_ids:
+    #             graph.loc[i, j] = np.inf
+    #     for col in graph.columns:
+    #         if col in self.locker_ids:
+    #             graph[col] = graph[col].apply(lambda x: np.inf if x > self.locker_radius)
+    #         else:
+    #             graph[col] = graph[col].apply(lambda x: np.inf if x > max_distance)
+    #     np.fill_diagonal(graph, np.inf)
+    #     return graph
+        
+    
+    def _dijkstra(self):
+        max_distance = self.battery_capacity / self.discharge_rate
+        graph = self.distances.copy()
+        graph.loc[self.customer_ids, self.customer_ids] = np.inf
+        graph.loc[self.locker_ids, self.locker_ids] = np.inf
+        for col in graph.columns:
+            if col in self.locker_ids:
+                graph[col] = graph[col].apply(lambda x: np.inf if x > self.locker_radius else x)
+            else:
+                graph[col] = graph[col].apply(lambda x: np.inf if x > max_distance else x)
+        np.fill_diagonal(graph.values, np.inf)
+        
+        n = len(graph)
+        distances = {i: float('inf') for i in range(n)}
+        distances[self.depot_id] = 0
+        priority_queue = [(self.depot_id, self.depot_id)]
+        predecessors = {i: None for i in range(n)}
+
+        while priority_queue:
+            current_distance, current_node = heapq.heappop(priority_queue)
+            if current_distance > distances[current_node]:
+                continue
+            for neighbor, weight in enumerate(graph.iloc[current_node]):
+                if weight != float('inf') and neighbor != current_node:
+                    distance = current_distance + weight
+                    if distance < distances[neighbor]:
+                        distances[neighbor] = distance
+                        predecessors[neighbor] = current_node
+                        heapq.heappush(priority_queue, (distance, neighbor))
+
+        self.dijkstra_distances = distances
+        self.dijkstra_predecessors = predecessors
+
+    def shortest_capable_path(self, target):
+        path = []
+        while target is not None:
+            path.append(target)
+            target = self.dijkstra_predecessors[target]
+        return path[::-1]
