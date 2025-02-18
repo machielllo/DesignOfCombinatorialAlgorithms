@@ -59,6 +59,18 @@ class Vehicle:
         self.total_distance += self.instance.distances.loc[node_id, deleted_arc[1]]
         self.recharge_quantities[trip].insert(position, charge)
 
+    def remove(self, node_id: int, trip: int):
+        idx = self.route[trip].index(node_id)
+        arc1 = (self.route[trip][idx - 1], node_id)
+        arc2 = (node_id, self.route[trip][idx + 1])
+        if node_id in self.instance.demands:
+            self.load[trip] -= self.instance.demands[node_id]
+        self.total_distance -= self.instance.distances.loc[arc1[0], arc1[1]]
+        self.total_distance -= self.instance.distances.loc[arc2[0], arc2[1]]
+        self.total_distance += self.instance.distances.loc[arc1[0], arc2[1]]
+        self.recharge_quantities[trip].pop(idx)
+        self.route[trip].remove(node_id)
+        
     def minimize_recharge_quantities(self):
         charge = self.instance.initial_charge[self.ID]
         for trip_idx, trip in enumerate(self.route):
