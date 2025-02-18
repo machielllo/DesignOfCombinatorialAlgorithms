@@ -9,7 +9,7 @@ def construction_heuristic(instance: Instance) -> Solution:
     "Construct an initial feasible solution"
     unassigned = set(instance.customer_ids)
     
-    vehicles = {vid: Vehicle(instance.initial_charge[vid]) for vid in instance.vehicle_ids}
+    vehicles = {vid: Vehicle(instance) for vid in instance.vehicle_ids}
     vids = cycle(instance.vehicle_ids)
     customer_assignment = {cid: None for cid in instance.customer_ids}
 

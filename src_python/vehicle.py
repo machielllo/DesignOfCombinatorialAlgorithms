@@ -4,13 +4,13 @@ from copy import deepcopy
 
 class Vehicle:
     def __init__(
-        self, initial_charge,
+        self,
+        instance: Instance,
         route: list = None,
         load: list = None,
-        distance: list = None,
         charge_times: list = None          
+        total_distance: float = 0,
     ):
-        self.charge = initial_charge
         if route is None:
             self.route = [[0, 0]]
         else:
@@ -19,8 +19,10 @@ class Vehicle:
             self.load = [0]
         else:
             self.load = load
-        if distance is None:
-            self.distance = distance
+        if total_distance is None:
+            self.total_distance = 0
+        else:
+            self.total_distance = total_distance
         if charge_times is None:
             self.charge_times = [[0, 0]]
         else:
@@ -28,10 +30,10 @@ class Vehicle:
 
     def copy(self):
         return Vehicle(
-            self.charge,
+            instance=self.instance,
             route=self.route.deepcopy(),
             load=self.load.copy(),
-            distance=self.distance.copy()
+            distance=self.total_distance,
             charge_times=self.charge_times.deepcopy()
         )
 
@@ -41,11 +43,19 @@ class Vehicle:
                 return idx
         self.route.append([0, 0])
         self.load.append(0)
-        self.distance.append(0)
         return idx + 1
 
-    def insert(self, node_id: int, trip: int, position=-1):
+    def insert(self, node_id: int, trip: int, position=-1, charge=0):
+        deleted_arc = self.route[trip][position - 1], self.route[trip][position]
         self.route[trip].insert(position, node_id)
+        self.load[trip] += self.instance.demand[node_id]
+        self.distance -= self.instance.distances.loc[*deleted_arc]
+        self.distance += self.instance.distances.loc[deleted_arc[0], node_id]
+        self.distance += self.instance.distances.loc[node_id, deleted_arc[1]]
+        self.charge.insert(position, charge)
+
+    def minimize_charge_times(self):
+        pass
         
     def __repr__(self):
         full_str = ""

@@ -7,9 +7,14 @@ from construction_heuristic import construction_heuristic
 # parser = argparse.ArgumentParser(description='Solve a MEVRP-PL instance using ALNS.')
 
 
+instances = ['929.inst', '943.inst', '973.inst', '978.inst', '996.inst']
+
+for inst in instances:
+    
+
 instance = Instance('../Toys/Not Annotated/996.inst')
 solution = construction_heuristic(instance)
-solution.plot()
+print(solution.vehicles)
 
 # print(instance.distances[0][1])
 
