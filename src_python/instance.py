@@ -14,10 +14,10 @@ class Instance:
         )
 
         
-    def read_instance(self, file_path: str):
+    def read(self, file_path: str):
         with open(file_path, 'r') as f:
             self.instance_id = int(f.readline())
-            f.readline()        # skip empty line
+            self.instance_name = f.readline().strip()
             self.num_customers = int(f.readline())
             self.num_chargers = int(f.readline())
             self.num_lockers = int(f.readline())
