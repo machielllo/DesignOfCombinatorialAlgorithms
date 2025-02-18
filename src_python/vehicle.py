@@ -30,4 +30,10 @@ class Vehicle:
             load=self.load.copy(),
             charge_times=self.charge_times.deepcopy()
         )
-    
+
+    def next_empty_trip(self):
+        for idx, trip in enumerate(self.routes):
+            if trip == [0, 0]:
+                return idx
+        self.routes.append([0, 0])
+        return idx + 1

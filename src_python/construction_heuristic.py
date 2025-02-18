@@ -39,7 +39,8 @@ def constuction_heuristic(instance: Instance) -> Solution:
         load = instance.demands[nn]
         trip = vehicle.next_empty_trip()
         
-        
+        while load < instance.volume_capacity:
+            
         
     
     return Solution(instance, vehicles=vehicles, customer_assignment=customer_assignment,
