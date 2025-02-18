@@ -16,6 +16,7 @@ class Solution:
         else:
             self.vehicles = vehicles
         if customer_assignment is None:
+            # (vehicle_id, trip_idx, locker_id)
             self.customer_assignment = {cid: None for cid in instance.customer_ids}
         else:
             self.customer_assignment = customer_assignment

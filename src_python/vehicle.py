@@ -38,3 +38,7 @@ class Vehicle:
         self.route.append([0, 0])
         self.load.append(0)
         return idx + 1
+
+    def insert(self, node_id: int, trip: int, position=-2):
+        self.route[trip].insert(position, node_id)
+        

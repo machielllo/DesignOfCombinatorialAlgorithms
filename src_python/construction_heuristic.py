@@ -20,14 +20,15 @@ def construction_heuristic(instance: Instance) -> Solution:
         vid = next(vids)
         vehicle = vehicles[vid]
         assigned, load = initial_locker_assignment(lid, instance, unassigned)
+        if len(assigned) == 0:
+            continue
         
         for cid in assigned:
             customer_assignment[cid] = (vid, None, lid)
             unassigned.remove(cid)
         # What if I have more lockers than vehicles?
-        # vehicle.next_empty_trip
         trip = vehicle.next_empty_trip()
-        vehicle.insert(node_id=lid, trip=trip, position=1)
+        vehicle.insert(node_id=lid, trip=trip)
         vehicle.load[trip] = load
         # vehicle.distance = 2 * instance.distance[lid, instance.depot_id] # ?
         
@@ -37,16 +38,20 @@ def construction_heuristic(instance: Instance) -> Solution:
         trip = vehicle.next_empty_trip()
         
         nn = min(unassigned, key=lambda x: instance.distances.loc[instance.depot_id, x])
+
+        if not instance.reachable_return(nn):
+            path = instance.find_charge_path(instance.depot_id, nn)
+            
         distance = instance.distances.loc[instance.depot_id, nn]
         charge_cost = distance * instance.discharge_rate
         load = instance.demands[nn]
         prev = instance.depot_id
         while load <= instance.volume_capacity and \
               instance.reachable_return(nn, prev, instance.battery_capacity - charge_cost):
-            vehicle.append(node_id=nn, trip=trip)
+            vehicle.insert(node_id=nn, trip=trip)
             unassigned.remove(nn)
             prev = nn
-            nn = min(unnassigned, key=lambda x: instance.distances.loc[instance.depot_id, x])
+            nn = min(unassigned, key=lambda x: instance.distances.loc[instance.depot_id, x])
             distance = instance.distances.loc[instance.depot_id, nn]
             charge_cost += distance * instance.discharge_rate
             load += instance.demands[nn]
@@ -63,6 +68,8 @@ def initial_locker_assignment(locker_id: int, instance: Instance, unassigned) ->
     customers_near_locker = [cid for cid in unassigned if instance.distances.loc[locker_id, cid] <= instance.locker_radius]
     customers_near_locker.sort(key=lambda x: instance.distances.loc[x, instance.depot_id])
     assigned_customers = []
+    if len(customers_near_locker) == 0:
+        return [], 0
     idx = 0
     load = instance.demands[customers_near_locker[idx]]
     while load < instance.volume_capacity and idx < len(customers_near_locker) - 1:

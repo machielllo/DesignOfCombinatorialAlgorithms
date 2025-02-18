@@ -73,6 +73,18 @@ class Instance:
                 self.locations[int(node_id)] = (float(x), float(y))
                 self.service_times[int(node_id)] = float(service_time)
 
+    def find_charge_path(self, from_id: int, to_id: int, charge=None) -> list[int]:
+        "return a list of charging stations along the way"
+        if charge is None:
+            charge = self.battery_capacity
+        intermediate_chargers = [
+            chid for chid in self.charger_ids if
+            self.distances.loc[chid, to_id] < self.distances.loc[from_id, to_id] and
+            self.distances.loc[chid, from_id] < self.distances.loc[from_id, to_id]
+        ]
+        
+    
+                
     def reachable_return(self, node_id, start=None, charge=None):
         if start is None:
             start = self.depot_id
