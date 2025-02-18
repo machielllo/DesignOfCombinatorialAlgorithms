@@ -1,6 +1,8 @@
 from instance import Instance
 from vehicle import Vehicle
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 class Solution:
     def __init__(self, instance: Instance,
@@ -48,15 +50,6 @@ class Solution:
             request_list=self.request_list.copy()
         )
         
-    
-
-    # def write(self, file_path: str):
-    #     with open(file_path, 'w') as f:
-    #         f.write(self.instance.instance_id + '\n')
-    #         f.write(self.name + '\n')
-    #         f.write(self.valid() + '\n')
-    #         f.write(f"{self.cost:.3f}\n")
-
     def write(self, file_path: str, annotations: bool = False):
         """
         Writes the solution in the following format (each value on a separate line):
@@ -169,4 +162,50 @@ class Solution:
                 if annotations:
                     f.write(f" // Unloading completion time vehicle {vid}")
                 f.write("\n")
-            
+                
+    def plot(self, ax=None):
+        "Plot the solution"
+        if ax is None:
+            fig, ax = plt.subplots(figsize=(12, 12))
+        depot = self.instance.locations[self.instance.depot_id]
+        ax.scatter(depot[0], depot[1], marker='s', color='blue')
+        customers_x = [self.instance.locations[cid][0] for cid in self.instance.customer_ids]
+        customers_y = [self.instance.locations[cid][1] for cid in self.instance.customer_ids]
+        ax.scatter(customers_x, customers_y, marker='x', color='blue')
+        chargers_x = [self.instance.locations[cid][0] for cid in self.instance.charger_ids]
+        chargers_y = [self.instance.locations[cid][1] for cid in self.instance.charger_ids]
+        ax.scatter(chargers_x, chargers_y, marker='P', color='yellow')
+        lockers_x = [self.instance.locations[cid][0] for cid in self.instance.locker_ids]
+        lockers_y = [self.instance.locations[cid][1] for cid in self.instance.locker_ids]
+        ax.scatter(lockers_x, lockers_y, marker='^', color='red')
+        for x, y in zip(lockers_x, lockers_y):
+            circle = patches.Circle((x, y), self.instance.locker_radius, edgecolor='red', facecolor='none', linewidth=2)
+            ax.add_patch(circle)
+        max_distance = self.instance.battery_capacity / self.instance.discharge_rate
+        for x, y in zip(chargers_x, lockers_y):
+            circle = patches.Circle((x, y), max_distance, edgecolor='none', facecolor='paleturquoise', linewidth=2, alpha=0.5)
+            ax.add_patch(circle)
+        circle = patches.Circle((depot[0], depot[1]), max_distance, edgecolor='none', facecolor='paleturquoise', linewidth=2, alpha=0.2)
+        ax.add_patch(circle)
+
+        for v in self.vehicles.values():
+            for trip in v.route:
+                locations = [self.instance.locations[ID] for ID in trip]
+                x, y = zip(*locations)
+                ax.plot(x, y)
+        
+        ax.grid(False)
+        ax.relim()
+        ax.autoscale()
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.spines['bottom'].set_visible(False)
+        ax.axis('off') 
+
+        ax.set_aspect('equal')
+        fig.show()
+        
+        
