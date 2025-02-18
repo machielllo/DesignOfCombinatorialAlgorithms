@@ -42,15 +42,15 @@ def construction_heuristic(instance: Instance) -> Solution:
         charge_cost = distance * instance.discharge_rate
         load = instance.demands[nn]
         prev = instance.depot_id
-        while load <= instance.volume_capacity and instance.reachable(nn, prev, instance.battery_capacity - charge_cost):
+        while load <= instance.volume_capacity and \
+              instance.reachable_return(nn, prev, instance.battery_capacity - charge_cost):
             vehicle.append(node_id=nn, trip=trip)
             unassigned.remove(nn)
             prev = nn
             nn = min(unnassigned, key=lambda x: instance.distances[instance.depot_id][x])
             distance = instance.distances[instance.depot_id][nn]
-            charge_cost = distance * instance.discharge_rate
-            load = instance.demands[nn]
-            prev = instance.depot_id
+            charge_cost += distance * instance.discharge_rate
+            load += instance.demands[nn]
             
         vehicle.load[trip] = load
     
@@ -61,8 +61,8 @@ def construction_heuristic(instance: Instance) -> Solution:
 def initial_locker_assignment(locker_id: int, instance: Instance, unassigned) -> list[int]:
     "The customers furthers away from the depot, that can be assigned to a locker,\
     until the max capacity is reached"
-    customers_near_locker = [cid for cid in unassigned if distance[locker_id, cid] <= instance.locker_radius]
-    customers_near_locker.sort(key=lambda x: distance[x, instance.depot_id])
+    customers_near_locker = [cid for cid in unassigned if distances[locker_id, cid] <= instance.locker_radius]
+    customers_near_locker.sort(key=lambda x: distances[x, instance.depot_id])
     assigned_customers = []
     idx = 0
     load = instance.demands[customers_near_locker[idx]]
