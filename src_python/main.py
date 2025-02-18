@@ -2,7 +2,7 @@ from instance import Instance
 from solution import Solution
 from alns import ALNS
 from construction_heuristic import construction_heuristic
-from operators import *
+# from operators import *
 import argparse
 
 parser = argparse.ArgumentParser(description='Solve a MEVRP-PL instance using ALNS.')

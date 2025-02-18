@@ -36,4 +36,5 @@ class Vehicle:
             if trip == [0, 0]:
                 return idx
         self.routes.append([0, 0])
+        self.load.append(0)
         return idx + 1
