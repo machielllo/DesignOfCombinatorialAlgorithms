@@ -32,9 +32,9 @@ class Vehicle:
         )
 
     def next_empty_trip(self):
-        for idx, trip in enumerate(self.routes):
+        for idx, trip in enumerate(self.route):
             if trip == [0, 0]:
                 return idx
-        self.routes.append([0, 0])
+        self.route.append([0, 0])
         self.load.append(0)
         return idx + 1

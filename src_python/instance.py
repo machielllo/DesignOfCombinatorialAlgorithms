@@ -78,7 +78,7 @@ class Instance:
             start = self.depot_id
         if charge is None:
             charge = self.battery_capacity
-        total_distance = self.distances[start, node_id] + self.distances[node_id, self.depot_id]
+        total_distance = self.distances.loc[start, node_id] + self.distances.loc[node_id, self.depot_id]
         if total_distance * self.discharge_rate < charge:
             return True
         else:
