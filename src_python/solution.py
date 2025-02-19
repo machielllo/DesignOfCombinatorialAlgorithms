@@ -201,6 +201,9 @@ class Solution:
             depot_penalty += self.instance.violation_cost_depot * max(
                 0, departure_times[-1] - self.instance.deadlines[self.instance.depot_id]
             )
+            customer_penalty += self.instance.violation_cost_customer * max(
+                0, departure_times[-1] - self.instance.deadlines[self.instance.customer_id]
+            )
 
             
             
