@@ -19,7 +19,6 @@ class Vehicle:
         self.load = load
         self.recharge_quantity = recharge_quantity
         self.cost = cost
-        self.charge = instance.initial_charge[ID]
         self.departure_times = departure_times
         
     def copy(self):
@@ -86,27 +85,61 @@ class Vehicle:
         )
         cost += self.instance.violation_cost_customer * sum(
             max(0, self.departure_times[idx] + delay - self.instance.deadlines[node])
-            for idx, node in enumerate(route[idx:-1]):
+            for idx, node in enumerate(route[idx:]):
             if node in self.instance.customer_ids
         )
         cost += (self.departure_times[-1] + delay - self.instance.deadlines[0]) * self.instance.violation_cost_depot
         return cost
         
-        
+
+    def _trip_idx(self, idx:int):
+        begin = idx - 1
+        end = idx
+        while self.route[end] != 0:
+            end += 1
+        while self.route[begin] != 0:
+            begin -= 1
+        return begin, end
+    
     def insert_customer(self, node: int, idx=-1):
+        added_distance = self.distance(self.route[idx-1], node) +\
+            self.distance(node, self.route[idx]) -\
+            self.distance(self.route[idx-1], self.route[idx])
+
+        added_charge = added_distance * self.instance.discharge_rate
+        prev_charger = self._prev_charger_idx(idx)
+        self.recharge_quantity[prev_charger] += added_charge
+        if added_charge + prev_recharge_quantity < 0:
+            added_charge_time = 0
+        else:
+            added_charge_time = (added_charge + min(prev_recharge_quantity, 0)) / self.instance.discharge_rate
+
+        departure_time = self.departure_times[idx-1] +\
+            self.distance(self.route[idx-1], node) / self.instance.speed + \
+            added_charge_time + self.instance.service_times[node]
+
+        delay = departure_time + self.distance(node, self.route[idx]) / self.instance.speed +\
+            self.instance.service_times[self.route[idx]] - self.departure_times[idx]
+
+        for idx, node in enumerate(route[prev_charger:idx-1]):
+            self.departure_times[idx] += added_charge_time
+        for idx, node in enumerate(route[idx:]):
+            self.departure_times[idx] += delay
+
         if idx => len(self.route):
             self.route.extend([0, node, 0])
         self.route.insert(idx, node)
         self.route_cost += self.insert_cost(idx, node)
+        self.load.insert(idx, self.load[idx-1])
+        tidx = self._trip_idx(idx)
+        for i in range(tidx[0], tidx[1]):
+            self.load[i] += self.instance.demands[node]
 
-        self.load
-        self.recharge_quantity 
-        self.departure_times
-
-    def remove(self, node: int, trip: int):
-        idx = self.route[trip].index(node)
-        arc1 = (self.route[trip][idx - 1], node)
-        arc2 = (node, self.route[trip][idx + 1])
+            
+    def remove_customer(self, node):
+        idx = self.route.index(node)
+        arc1 = (self.route[idx - 1], node)
+        arc2 = (node, self.route[idx + 1])
         if node in self.instance.demands:
             self.load[trip] -= self.instance.demands[node]
         self.total_distance -= self.instance.distances.loc[arc1[0], arc1[1]]

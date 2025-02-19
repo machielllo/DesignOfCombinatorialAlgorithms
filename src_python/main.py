@@ -20,6 +20,12 @@ instances = ['929.inst', '943.inst', '973.inst', '978.inst', '996.inst']
 
 toys_path = '../Toys/Not Annotated/'
 
+# for name in instances:
+#     instance = Instance(toys_path + name)
+#     solution = construction_heuristic(instance)
+#     print(solution.vehicles)
+
+
 instance = Instance('../Toys/Not Annotated/996.inst')
 solution = construction_heuristic(instance)
 print(solution.vehicles)
