@@ -209,8 +209,10 @@ class Solution:
         fig.show()
 
     def distance_based_cost(self) -> float:
-        for v in self.vehicles.values()
-            v.
+        travel_cost = 0
+        for v in self.vehicles.values():
+            travel_cost += (v.total_distance)
+
 
     def penalty_cost(self) -> float:
         "calculate the cost for deadline penalties"
