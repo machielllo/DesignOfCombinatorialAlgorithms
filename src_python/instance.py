@@ -15,8 +15,8 @@ class Instance:
             np.linalg.norm(np.array(loc_values)[:, np.newaxis] - np.array(loc_values), axis=2),
             index=node_ids, columns=node_ids
         )
+        self.travel_times = self.distances / self.speed
         self._dijkstra()
-
         
     def read(self, file_path: str):
         with open(file_path, 'r') as f:
