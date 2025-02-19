@@ -3,11 +3,14 @@ import numpy as np
 import pandas as pd
 import heapq
 
+# This class is used to represent the instances that we receive from the lecturers.
 class Instance:
+    # The constructor to initialize an Instance object's attributes:
     def __init__(self, file_path: str):
-        self.read(file_path)
+        self.read(file_path) # Use the read function defined below.
         loc_values = list(self.locations.values())
         node_ids = list(self.locations.keys())
+        # We create a matrix of the distance between different nodes.
         self.distances = pd.DataFrame(
             np.linalg.norm(np.array(loc_values)[:, np.newaxis] - np.array(loc_values), axis=2),
             index=node_ids, columns=node_ids

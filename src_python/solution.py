@@ -208,6 +208,10 @@ class Solution:
         ax.set_aspect('equal')
         fig.show()
 
+    def distance_based_cost(self) -> float:
+        for v in self.vehicles.values()
+            v.
+
     def penalty_cost(self) -> float:
         "calculate the cost for deadline penalties"
         depot_penalty = 0
