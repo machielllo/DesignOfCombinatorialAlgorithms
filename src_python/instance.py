@@ -13,7 +13,7 @@ class Instance:
             index=node_ids, columns=node_ids
         )
         self._dijkstra()
-
+        self.charge_spots = set([self.depot_id] + self.charger_ids)
         
     def read(self, file_path: str):
         with open(file_path, 'r') as f:
