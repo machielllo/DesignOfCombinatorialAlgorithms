@@ -51,84 +51,54 @@ class Solution:
         )
         
     def write(self, file_path: str, annotations: bool = False):
-        """
-        Writes the solution in the following format (each value on a separate line):
-
-          1. instance id (optionally followed by an annotation)
-          2. solution name
-          3. feasibility flag (1 if feasible, else 0)
-          4. total objective cost (formatted to three decimals)
-          5. locker open cost (real)
-          6. vehicle deploy cost (real)
-          7. distance cost (real)
-          8. lateness penalty at customers (real)
-          9. lateness penalty at depot (real)
-         10. locker delivery indicator for each customer (comma-separated)
-         11. For each vehicle (in sorted order):
-             a. route (starting with the vehicle id)
-             b. charge quantities (starting with the vehicle id)
-             c. unloading completion times (starting with the vehicle id)
-        """
         with open(file_path, 'w') as f:
-            # Line 1: Instance id
             f.write(str(self.instance.instance_id))
             if annotations:
                 f.write(" // ID of the instance this solution solves")
             f.write("\n")
 
-            # Line 2: Name for your solution
             f.write(self.name)
             if annotations:
                 f.write(" // Name for your solution (e.g. seed, #iterations, random json str, etc)")
             f.write("\n")
 
-            # Line 3: Feasibility flag: 1 if solution is feasible, else 0.
             f.write(self.valid)
             if annotations:
                 f.write(" // 1 iff we believe this solution is feasible, otherwise 0")
             f.write("\n")
 
-            # Line 4: Total objective cost.
             f.write(f"{self.cost:.3f}")
             if annotations:
                 f.write(" // Total objective (real)")
             f.write("\n")
 
-            # Line 5: Locker open cost.
             f.write(f"{self.locker_cost():.3f}")
             if annotations:
                 f.write(" // Locker open cost (real)")
             f.write("\n")
 
-            # Line 6: Vehicle deploy cost.
             f.write(f"{self.deployment_cost:.3f}")
             if annotations:
                 f.write(" // Vehicle deploy cost (real)")
             f.write("\n")
 
-            # Line 7: Distance cost.
             f.write(f"{self.travel_cost:.3f}")
             if annotations:
                 f.write(" // Distance cost (real)")
             f.write("\n")
 
-            # Line 8: Lateness penalty at customers.
             f.write(f"{self.violation_cost_customer:.3f}")
             if annotations:
                 f.write(" // Lateness penalty at customers (real)")
             f.write("\n")
 
-            # Line 9: Lateness penalty at depot.
             f.write(f"{self.violation_cost_depot:.3f}")
             if annotations:
                 f.write(" // Lateness penalty at depot (real)")
             f.write("\n")
 
-            # Line 10: Locker delivery indicator for every customer.
-            # For each customer (in the order given by instance.customer_ids), write the assigned locker id or 0.
             locker_indicators = []
             for cid in self.instance.customer_ids:
-                # If no locker assignment is provided, default to 0.
                 locker_indicators.append(str(self.customer_assignment.get(cid, 0)))
             f.write(", ".join(locker_indicators))
             if annotations:
@@ -136,27 +106,22 @@ class Solution:
                     " // Indicator of locker delivery for every customer 1, ..., n (0 if home delivery; locker's node ID, if locker delivery; empty line if n = 0)")
             f.write("\n")
 
-            # Now write details for each vehicle.
+
             for vid in sorted(self.vehicles.keys()):
                 vehicle = self.vehicles[vid]
-                # a. Vehicle route line:
-                # Format: vehicle id, followed by the sequence of stops.
+
                 route_line = f"{vid}, " + ", ".join(str(stop) for stop in vehicle.route)
                 f.write(route_line)
                 if annotations:
                     f.write(f" // Route vehicle {vid}")
                 f.write("\n")
 
-                # b. Charge quantities line:
-                # Format: vehicle id, followed by the charge quantities at each stop.
                 cq_line = f"{vid}, " + ", ".join(f"{q:.3f}" for q in vehicle.charge_quantities)
                 f.write(cq_line)
                 if annotations:
                     f.write(f" // Charge quantities vehicle {vid}")
                 f.write("\n")
 
-                # c. Unloading completion times line:
-                # Format: vehicle id, followed by the unloading times at each stop.
                 ut_line = f"{vid}, " + ", ".join(f"{ut:.6f}" for ut in vehicle.unloading_times)
                 f.write(ut_line)
                 if annotations:
@@ -208,11 +173,24 @@ class Solution:
         ax.set_aspect('equal')
         fig.show()
 
+    def total_cost(self) -> float:
+        return self.distance_based_cost() + self.deployment_cost() + self.penalty_cost()
+
     def distance_based_cost(self) -> float:
         travel_cost = 0
         for v in self.vehicles.values():
-            travel_cost += (v.total_distance)
+            travel_cost += (self.instance.travel_cost * v.total_distance)
 
+        return travel_cost
+
+    def deployment_cost(self) -> float:
+        deployed_vehicles = 0
+        for v in self.vehicles.values():
+            if v.total_distance != 0:
+                deployed_vehicles += 1
+
+
+        return self.instance.deployment_cost * deployed_vehicles
 
     def penalty_cost(self) -> float:
         "calculate the cost for deadline penalties"
@@ -223,6 +201,7 @@ class Solution:
             depot_penalty += self.instance.violation_cost_depot * max(
                 0, departure_times[-1] - self.instance.deadlines[self.instance.depot_id]
             )
+
             
             
     # def insert_cost(self, node_id: int, vid: int, trip: int, index: int):
