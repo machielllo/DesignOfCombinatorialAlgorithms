@@ -1,9 +1,5 @@
-import os
-os.getcwd()
-
 from instance import Instance
-from solution import Solution
-from vehicle import Vehicle
+from solution import Solution, Index
 from alns import ALNS
 from construction_heuristic import construction_heuristic
 # from operators import *
@@ -21,14 +17,23 @@ instances = ['929.inst', '943.inst', '973.inst', '978.inst', '996.inst']
 toys_path = '../Toys/Not Annotated/'
 
 instance = Instance('../Toys/Not Annotated/996.inst')
-solution = construction_heuristic(instance)
-print(solution.vehicles)
+sol = Solution(instance, name="Empty 996")
+# sol._insert_empty_trip(-1)
 
-for vehicle in solution.vehicles.values():
-    vehicle.print()
 
-v2 = solution.vehicles[2]
 
+sol.insert_cost(Index(0, 0, 1, 0), 1)
+print(sol)
+
+sol.insert_cost(Index(1, 0, 1, 0), 4)
+sol.insert_cost(Index(0, 0, 1, 0), 1)
+
+
+print(sol)
+
+sol.write('test.sol', annotations=True)
+sol.check_validity(verbose=True)
+# solution = construction_heuristic(instance)
 # print(instance.distances[0][1])
 
 def main(args):
@@ -46,4 +51,14 @@ def main(args):
 if __name__ == '__main__':
     args = parser.parse_args()
     main(args.instance, args.output)
-    
+
+from collections import Counter
+routes = [[0, 1, 2, 0], [0, 6, 7, 0], [0, 2, 1, 0]]
+
+lockers = {5: [3, 4], 6: None}
+
+c = Counter({node: 0 for node in range(1, 5)})
+for route in routes:
+    c.update(route)
+for locker in lockers.values():
+    c.update(locker)
