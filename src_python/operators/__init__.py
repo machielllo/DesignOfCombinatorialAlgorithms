@@ -1,2 +1,0 @@
-from random_remove_customer import random_remove_customer
-from greedy_insert_customer import greedy_insert_customer
