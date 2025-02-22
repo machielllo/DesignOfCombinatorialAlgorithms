@@ -159,7 +159,7 @@ class Solution:
     def draw(self, ax=None, file_out=None):
         """Draw the instance and solution."""
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=(12, 12))
             plot = True
 
         self._plot_instance(ax)
@@ -175,7 +175,7 @@ class Solution:
             if file_out is None:
                 plt.show()
             else:
-                plt.savefig(file_out)
+                plt.savefig(file_out, bbox_inches='tight')
 
     def next_empty_trip(self, route: int) -> int:
         for idx, trip in enumerate(self.routes[route]):
@@ -430,22 +430,27 @@ May charge more than the battery capacity allows!
         x, y = self.instance.location[0]
         ax.scatter(x, y, marker='s', color='blue')
         circle = patches.Circle((x, y), self.instance.radius_chargable, edgecolor='none',
-                                facecolor='paleturquoise', linewidth=2, alpha=0.15)
+                                facecolor='paleturquoise', linewidth=2, alpha=0.15, clip_on=True)
         ax.add_patch(circle)
-        x, y = zip(*[self.instance.location[node] for node in self.instance.customer_ids])
-        ax.scatter(x, y, marker='x', color='blue')
-        x, y = zip(*[self.instance.location[node] for node in self.instance.charger_ids])
-        ax.scatter(x, y, marker='P', color='yellow')
-        for x, y in zip(x, y):
-            circle = patches.Circle((x, y), self.instance.radius_chargable, edgecolor='none',
-                                    facecolor='paleturquoise', linewidth=2, alpha=0.15)
-            ax.add_patch(circle)
-        x, y = zip(*[self.instance.location[node] for node in self.instance.locker_ids])
-        ax.scatter(x, y, marker='^', color='red')
-        for x, y in zip(x, y):
-            circle = patches.Circle((x, y), self.instance.radius_locker, edgecolor='red',
-                                    facecolor='none', linewidth=2)
-            ax.add_patch(circle)
+        
+        if self.instance.customer_ids:
+            x, y = zip(*[self.instance.location[node] for node in self.instance.customer_ids])
+            ax.scatter(x, y, marker='x', color='blue')
+            
+        if self.instance.charger_ids:
+            x, y = zip(*[self.instance.location[node] for node in self.instance.charger_ids])
+            ax.scatter(x, y, marker='P', color='yellow')
+            for x, y in zip(x, y):
+                circle = patches.Circle((x, y), self.instance.radius_chargable, edgecolor='none',
+                                        facecolor='paleturquoise', linewidth=2, alpha=0.15, clip_on=True)
+                ax.add_patch(circle)
+        if self.instance.locker_ids:
+            x, y = zip(*[self.instance.location[node] for node in self.instance.locker_ids])
+            ax.scatter(x, y, marker='^', color='red')
+            for x, y in zip(x, y):
+                circle = patches.Circle((x, y), self.instance.radius_locker, edgecolor='red',
+                                        facecolor='none', linewidth=2, clip_on=True)
+                ax.add_patch(circle)
         
     def _plot_route(self, ax, route: int):
         for trip in self.routes[route]:
@@ -461,9 +466,16 @@ May charge more than the battery capacity allows!
 
     def _plot_empty(self, ax):
         "Remove all the noise"
+
+        self.instance.location
+        x, y = zip(*self.instance.location.values())
+        min_x, max_x = min(x) - 50, max(x) + 50
+        min_y, max_y = min(y) - 50, max(y) + 50
+        ax.set_xlim(min_x, max_x)
+        ax.set_ylim(min_y, max_y)
         ax.grid(False)
-        ax.relim()
-        ax.autoscale()
+        #ax.relim()
+        #ax.autoscale()
         ax.set_xticks([])
         ax.set_yticks([])
         ax.spines['top'].set_visible(False)
