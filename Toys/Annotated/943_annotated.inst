@@ -5,7 +5,7 @@
 1// #Lockers (int >= 0)
 4// #Vehicles (int > 0)
 35.16// Speed distance per time unit (real > 0)
-5// Max vehicle volume (int > 0)
+9// Max vehicle volume (int > 0)
 511// Max battery capacity (int > 0)
 0.95// Discharge rate per distance unit (real >= 0)
 474.96// Recharge rate per time unit (real > 0)
