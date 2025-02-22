@@ -1,29 +1,52 @@
 # DesignOfCombinatorialAlgorithms
 DCA Course RUG 2025 
 
-## 11 Feb 12:00 - 12:20: Draft Write Up
+## Instance
+read
 
-### Heuristic
+## Solution
+write
+draw
+insert
+remove
+add_to_locker
+remove_from_locker
+cost_total
+next_empty_trip
+feasible
 
-ALNS does super good in the literature. State of the Art. 
-
-#### Constructive
-
-- Needs to be feasible
-
-- Sweep / Bin Pack?
-
-- NN, reason with constraints
-
-#### Improvements
+usefull:
+ - _demand / _distance / etc
+ - _cost_locker / _cost_distance / etc
+ - ``__deepcopy__`` / ``__str__`` / etc
 
 
-### Data Structure
+maybe:
+``extend``
+intermediate cost saving?
 
-The classic structure is a list of lists.
+probably:
+rework ``_check_X``
+e.g. after removing stuff, need some way to check if a trip charge is OK
 
-```
-[[0, 1, 0], [0, 2, 3, 0] [0, 0] ... ]
-```
 
-How to include charging time?
+## Construct
+Why does 973 go to an empty locker?
+
+Maybe make simpler, no nearest-neighbor, just one per trip:
+ - while unassigned:
+ - n = unassigned.pop()
+ - path = shortest_path(tree, 0, n, instance)
+ - if path[-2] not in instance.locker_ids:
+ - solution.insert(path[1:] + path[-2:1:-1]) (?)
+ - else: assign musts (and extras) to locker
+ - remove locker from tree
+ - solution.insert(path[1:-1] + path[-3:1:-1]) (?)
+
+## TODO: ALNS
+copy alns
+
+should mostly work
+
+## TODO: TESTING 
+
