@@ -49,6 +49,9 @@ def construction_heuristic(instance: Instance) -> Solution:
                     unassigned.remove(customer)
                 if solution._demand(locker) == instance.capacity_volume:
                     break
+            # If no customers were added to the locker, break
+            if not solution.lockers[locker]:
+                break
             # insert up to (and including) locker in trip
             for node in path[1:-1]:
                 solution.insert(Index(route, trip, -1, 0), node)
@@ -149,7 +152,6 @@ def make_tree(instance: Instance) -> dict:
         ]
     return tree
 
-
 def shortest_path(tree, start, goal, instance):
     "Find the shortest path, kind of"
     pq = [(0, start, [])]  # (cost, current_node, path)
@@ -164,6 +166,6 @@ def shortest_path(tree, start, goal, instance):
             return path
         for neighbor in tree.get(node, []):
             if neighbor not in visited:
-                edge_cost = 0.0 if neighbor in instance.locker_ids else instance.distance.loc[node, neighbor]
+                edge_cost = 0.0 if node in instance.locker_ids else instance.distance.loc[node, neighbor]
                 heapq.heappush(pq, (cost + edge_cost, neighbor, path))
     return None 
